@@ -63,7 +63,7 @@ class Is_checkin(object):
             # 第二步，获取用户信息结果
             url = 'https://account.i-search.com.cn/v1/studio/expiration?token=' + self._access_token + '&lang=zh_CN'
             result = self._session.get(url=url, verify=False)
-            print('用户最近登录时间：%s' % result.json().get('lastLoginTime'))
+            print('用户最近登录时间：%s' % result.json().get('result').get('lastLoginTime'))
             self._custNo = result.json().get('result').get('custNo')
             self._custName = result.json().get('result').get('userName')
             self._tenantNo = result.json().get('result').get('tenantNo')
@@ -196,7 +196,7 @@ if __name__ == "__main__":
     print('当前时间：', datetime.datetime.now())
     env_dist = os.environ
     username = env_dist.get('USERNAME')  # 用户名
-    password = env_dist.get('PASSWORD')  # 用户名
+    password = env_dist.get('PASSWORD')  # 密码
     if not all((username, password)):
         print('获取用户名密码失败，请从先配置用户名或密码再启动程序！')
         exit()
