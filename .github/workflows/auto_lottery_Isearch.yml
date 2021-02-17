@@ -25,11 +25,11 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build with environment
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-          SERVERPUSHKEY: ${{ secrets.SERVERPUSHKEY }}
-          TZ: Asia/Shanghai
+      env:
+        USERNAME: ${{ secrets.USERNAME }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+        SERVERPUSHKEY: ${{ secrets.SERVERPUSHKEY }}
+        TZ: Asia/Shanghai
     - name: run with main.py
       run: |
         python main.py
