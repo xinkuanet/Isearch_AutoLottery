@@ -5,11 +5,11 @@ on:
     branches:
       - master
   schedule:
-    - cron: '0 10 * * *'
-    # cron表达式，Actions时区是UTC时间，所以上午9点要往前推8个小时
+    - cron: '10 0 * * *'
+    # cron表达式，Actions时区是UTC时间，这里是UTC时区每天0点10分运行，即UTF时区每天8点10分
 
 jobs:
-  build:
+  start:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -21,11 +21,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: run with main.py
+    - name: SET Environment
       env:
         USERNAME: ${{ secrets.USERNAME }}
         PASSWORD: ${{ secrets.PASSWORD }}
         SERVERPUSHKEY: ${{ secrets.SERVERPUSHKEY }}
         TZ: Asia/Shanghai
+      run: |
+    - name: Run with Python Script
       run: |
         python main.py
