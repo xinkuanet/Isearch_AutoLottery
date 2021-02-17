@@ -50,26 +50,27 @@ class Is_checkin(object):
 
         if not result.json().get('access_token'):
             print('登录失败，错误信息：%s' % result.json().get('msg'))
-
+            exit()
         else:
-            print('获取token结果：%s' % result.json().get('access_token'))
+            print('登录成功，响应token结果：%s' % result.json().get('access_token'))
             self._access_token = result.json().get('access_token')
 
             # 生成抽奖页面链接
             url = 'https://rpa.i-search.com.cn/store/attendance?token=' + self._access_token + '&lang=zh_CN&machineCode=' + \
-                  self._deviceCode + '&channel_no=DevStand&_=' + str(round(time.time() * 1000))
-            print('活动页面快速查看地址：%s' % url)
+                 self._deviceCode + '&channel_no=DevStand&_=' + str(round(time.time() * 1000))
+            print('生成签到抽奖页面链接：%s' % url)
 
             # 第二步，获取用户信息结果
             url = 'https://account.i-search.com.cn/v1/studio/expiration?token=' + self._access_token + '&lang=zh_CN'
             result = self._session.get(url=url, verify=False)
-            print('获取用户信息结果：%s' % result.text)
+            print('用户最近登录时间：%s' % result.json().get('lastLoginTime'))
             self._custNo = result.json().get('result').get('custNo')
             self._custName = result.json().get('result').get('userName')
             self._tenantNo = result.json().get('result').get('tenantNo')
 
     def checkinHistroy(self):
         # 获取签到历史
+        print('-' * 5 + '获取签到信息' + '-' * 5)
         url = "https://restapi.i-search.com.cn/store/v1/checkin?custNo=" + self._custNo
         timestamp = str(round(time.time() * 1000))  # 获取时间戳
         signature = encrypt_sign(timestamp=timestamp, data='custNo=' + self._custNo)  # 计算签名
@@ -83,7 +84,7 @@ class Is_checkin(object):
         result = self._session.get(url=url, headers=headers, verify=False)  # 发送请求
         day = result.json().get('result').get('day')
         signTimeList = [signDate.get('signTime') for signDate in result.json().get('result').get('signList')]
-        print('今天是本签到周期的第：%s 天，历史签到日期为：%s' % (day, str(signTimeList)))
+        print('今天是签到周期中的第：%s 天，本周期已签到记录：%s' % (day, str(signTimeList)))
         return signTimeList
 
     def checkin(self, signTime=""):
@@ -130,6 +131,7 @@ class Is_checkin(object):
         检查可签到次数
         :return: int
         """
+        print('-' * 5 + '获取可抽奖次数' + '-' * 5)
         # 第一步，统计账号可抽奖次数
         url = 'https://restapi.i-search.com.cn/store/v1/lotterycount?custNo=' + self._custNo
         timestamp = str(round(time.time() * 1000))  # 获取时间戳
@@ -142,7 +144,7 @@ class Is_checkin(object):
         # result = self._session.get(url=url, headers=headers)  # 发送请求
         result = self._session.get(url=url, headers=headers, verify=False)  # 发送请求
         remainingTimes = result.json()['result']['remainingTimes']  # 可抽奖次数
-        print('当前可抽奖次数结果：%s' % remainingTimes)
+        print('当前可抽奖次数为：%s' % remainingTimes)
         return remainingTimes
 
     def lottery(self, pricedict='奖品信息字典.json'):
@@ -191,25 +193,37 @@ class Is_checkin(object):
 
 
 if __name__ == "__main__":
-    print('任务启动开始')
-    print(datetime.datetime.now())
+    print('当前时间：', datetime.datetime.now())
     env_dist = os.environ
     username = env_dist.get('USERNAME')  # 用户名
     password = env_dist.get('PASSWORD')  # 用户名
     if not all((username, password)):
-        print('请先配置用户名或密码，再部署此程序！')
+        print('获取用户名密码失败，请从先配置用户名或密码再启动程序！')
         exit()
+
     isearch = Is_checkin(username, password)
     signTimeList = isearch.checkinHistroy()  # 获取本周期签到历史
+
     # 获取最近三天日期
     dateFor3 = [getdate(day) for day in range(3)]
     # 获取最近三天还没签到的数据
     needCheckDate = [day for day in dateFor3 if day not in signTimeList]
-    for day in needCheckDate:
-        # 进行签到
-        isearch.checkin(signTime=day)
-        time.sleep(random.randint(2, 4))
+    if needCheckDate:
+        print('需进行签到日期：%s' % str(needCheckDate))
+        print('-' * 5 + '开始进行签到' + '-' * 5)
+        for day in needCheckDate:
+            # 进行签到
+            isearch.checkin(signTime=day)
+            time.sleep(random.randint(2, 4))
+    else:
+        print('无需签到日期，跳过签到动作！')
+
     remainingTimes = isearch.lotterycount()
-    for _ in range(remainingTimes):
-        isearch.lottery()
-        time.sleep(random.randint(2, 4))
+    if remainingTimes:
+        print('-' * 5 + '开始进行抽奖' + '-' * 5)
+        for _ in range(remainingTimes):
+            isearch.lottery()
+            time.sleep(random.randint(2, 4))
+    else:
+        print('无可抽奖次数，跳过抽奖动作！')
+
