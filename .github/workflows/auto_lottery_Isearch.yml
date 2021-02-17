@@ -7,8 +7,9 @@ on:
   schedule:
     - cron: '0 10 * * *'
     # cron表达式，Actions时区是UTC时间，所以上午9点要往前推8个小时
+    
 jobs:
-  build:
+  start:
     runs-on: ubuntu-latest
     strategy:
       matrix:
