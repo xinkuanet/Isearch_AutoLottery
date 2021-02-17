@@ -200,7 +200,6 @@ if __name__ == "__main__":
     if not all((username, password)):
         print('获取用户名密码失败，请从先配置用户名或密码再启动程序！')
         exit()
-
     isearch = Is_checkin(username, password)
     signTimeList = isearch.checkinHistroy()  # 获取本周期签到历史
 
