@@ -22,7 +22,7 @@ def encrypt_sign(timestamp, data='', key='isearch'):
     signature = bytes.decode(base64.b64encode(hex_str.encode('utf-8')))
     return signature
 
-def getdate(self, beforeOfDay=0):
+def getdate(beforeOfDay=0):
     today = datetime.datetime.now()
     # 计算偏移量
     offset = datetime.timedelta(days=-beforeOfDay)
