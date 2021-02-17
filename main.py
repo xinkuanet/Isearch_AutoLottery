@@ -11,12 +11,9 @@ import time
 
 import requests
 from requests_toolbelt import MultipartEncoder
-import logging
 
 from tools import encrypt_sign, getdate
 
-logging.basicConfig(filename='isearch.txt', filemode='w', level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s: %(message)s')
 
 requests.packages.urllib3.disable_warnings()
 requests.adapters.DEFAULT_RETRIES = 5
@@ -28,7 +25,7 @@ class Is_checkin(object):
         uername：艺赛旗用户名
         password: 密码
         """
-        logging.info('-'*5 + '艺赛旗账户自动登录' + '-'*5)
+        print('-'*5 + '艺赛旗账户自动登录' + '-'*5)
         self._username = username  # 用户名
         self._password = password  # 密码
         self._deviceCode = ''.join(random.choice('0123456789ABCDEF') for _ in range(32))  # 生成随机机器码
@@ -52,21 +49,21 @@ class Is_checkin(object):
         #
 
         if not result.json().get('access_token'):
-            logging.error('登录失败，错误信息：%s' % result.json().get('msg'))
+            print('登录失败，错误信息：%s' % result.json().get('msg'))
 
         else:
-            logging.info('获取token结果：%s' % result.json().get('access_token'))
+            print('获取token结果：%s' % result.json().get('access_token'))
             self._access_token = result.json().get('access_token')
 
             # 生成抽奖页面链接
             url = 'https://rpa.i-search.com.cn/store/attendance?token=' + self._access_token + '&lang=zh_CN&machineCode=' + \
                   self._deviceCode + '&channel_no=DevStand&_=' + str(round(time.time() * 1000))
-            logging.info('活动页面快速查看地址：%s' % url)
+            print('活动页面快速查看地址：%s' % url)
 
             # 第二步，获取用户信息结果
             url = 'https://account.i-search.com.cn/v1/studio/expiration?token=' + self._access_token + '&lang=zh_CN'
             result = self._session.get(url=url, verify=False)
-            logging.info('获取用户信息结果：%s' % result.text)
+            print('获取用户信息结果：%s' % result.text)
             self._custNo = result.json().get('result').get('custNo')
             self._custName = result.json().get('result').get('userName')
             self._tenantNo = result.json().get('result').get('tenantNo')
@@ -86,7 +83,7 @@ class Is_checkin(object):
         result = self._session.get(url=url, headers=headers, verify=False)  # 发送请求
         day = result.json().get('result').get('day')
         signTimeList = [signDate.get('signTime') for signDate in result.json().get('result').get('signList')]
-        logging.info('今天是本签到周期的第：%s 天，历史签到日期为：%s' % (day, str(signTimeList)))
+        print('今天是本签到周期的第：%s 天，历史签到日期为：%s' % (day, str(signTimeList)))
         return signTimeList
 
     def checkin(self, signTime=""):
@@ -125,7 +122,7 @@ class Is_checkin(object):
             "timestamp": timestamp,
         }
         result = self._session.post(url=url, headers=headers, data=data)  # 发送签到请求
-        logging.info('签到日期：%s，签到结果：%s' % (signTime, result.text))
+        print('签到日期：%s，签到结果：%s' % (signTime, result.text))
 
 
     def lotterycount(self):
@@ -145,7 +142,7 @@ class Is_checkin(object):
         # result = self._session.get(url=url, headers=headers)  # 发送请求
         result = self._session.get(url=url, headers=headers, verify=False)  # 发送请求
         remainingTimes = result.json()['result']['remainingTimes']  # 可抽奖次数
-        logging.info('当前可抽奖次数结果：%s' % remainingTimes)
+        print('当前可抽奖次数结果：%s' % remainingTimes)
         return remainingTimes
 
     def lottery(self, pricedict='奖品信息字典.json'):
@@ -183,11 +180,10 @@ class Is_checkin(object):
                 price_dict = f.read()
             price_dict = eval(price_dict)  # 字符串转换字典
             priceInfo = price_dict[str(prizeId)]  # 奖品信息
-            logging.info('抽奖抽到的奖品是：%s' % priceInfo)
+            print('抽奖抽到的奖品是：%s' % priceInfo)
             # 记录中奖奖品信息到本地文件
-
         else:
-            logging.info('抽奖请求失败，请求结果：%s' % result.text)
+            print('抽奖请求失败，请求结果：%s' % result.text)
 
     def __del__(self):
         # 关闭session连接
@@ -195,15 +191,14 @@ class Is_checkin(object):
 
 
 if __name__ == "__main__":
-    logging.info('任务启动开始')
+    print('任务启动开始')
+    print(datetime.datetime.now())
     env_dist = os.environ
     username = env_dist.get('USERNAME')  # 用户名
     password = env_dist.get('PASSWORD')  # 用户名
     if not all((username, password)):
-        logging.error('请先配置用户名或密码，再部署此程序！')
-        print('请先配置用户名或密码，再部署此程序！~~~')
+        print('请先配置用户名或密码，再部署此程序！')
         exit()
-
     isearch = Is_checkin(username, password)
     signTimeList = isearch.checkinHistroy()  # 获取本周期签到历史
     # 获取最近三天日期
@@ -213,6 +208,8 @@ if __name__ == "__main__":
     for day in needCheckDate:
         # 进行签到
         isearch.checkin(signTime=day)
+        time.sleep(random.randint(2, 4))
     remainingTimes = isearch.lotterycount()
     for _ in range(remainingTimes):
         isearch.lottery()
+        time.sleep(random.randint(2, 4))
