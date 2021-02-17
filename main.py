@@ -201,6 +201,7 @@ if __name__ == "__main__":
     password = env_dist.get('PASSWORD')  # 用户名
     if not all((username, password)):
         logging.error('请先配置用户名或密码，再部署此程序！')
+        print('请先配置用户名或密码，再部署此程序！~~~')
         exit()
 
     isearch = Is_checkin(username, password)
