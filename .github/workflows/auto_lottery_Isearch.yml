@@ -21,13 +21,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: SET Environment
+    - name: Run with Python Script
       env:
         USERNAME: ${{ secrets.USERNAME }}
         PASSWORD: ${{ secrets.PASSWORD }}
         SERVERPUSHKEY: ${{ secrets.SERVERPUSHKEY }}
         TZ: Asia/Shanghai
-      run: |
-    - name: Run with Python Script
       run: |
         python main.py
