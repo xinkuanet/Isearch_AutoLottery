@@ -42,28 +42,36 @@ Isearch_AutoLottery
 | ------------- | ------------------- |
 | USERNAME      | 用户名              |
 | PASSWORD      | 密码                |
-
 ![图示][image-1]
 
-3. **手动触发 workflow 运行**
-
-**Github Actions 默认处于关闭状态，还大家请手动开启 Actions ，执行一次工作流，验证是否可以正常工作。**
-![图示][image-2]
 
 
-4. **流程运行情况查看**
-![图示][image-3]
-![图示][image-4]
 
-   
-5. **修改每日任务执行的时间**
-如果需要，请修改 `.github/workflows/auto_lottery_Isearch.yml`，在第 8 行左右位置找到下如下配置。
+3. **修改每日任务执行的时间**
+
+修改 `.github/workflows/auto_lottery_Isearch.yml`，在第 8 行左右位置找到下如下配置。
 
 ```yml
   schedule:
     - cron: '10 0 * * *'
     # cron表达式，Actions时区是UTC时间，这里是UTC时区每天0点10分运行，即UTF时区每天8点10分
+    # 不懂cron表达式的，可以进网站[https://crontab.guru/](https://crontab.guru/)看下
 ```
+**这里强烈建议大家自己实际情况修改下，不然大家的程序每天都同个时间点去签到，那也太。。。。**
+
+
+
+4. **手动触发 workflow 运行(测试是否可正常运行)**
+
+**Github Actions 默认处于关闭状态，还大家请手动开启 Actions ，执行一次工作流，验证是否可以正常工作。**
+![图示][image-2]
+
+
+5. **流程运行情况查看**
+![图示][image-3]
+![图示][image-4]
+
+6. 结束！如果流程运行日志能正常显示，说明程序没问题，大家就这么挂着吧，基本上也不用理了。
 
 本工具的 Actions 自动构建配置了缓存，平均运行时间在 20s 左右。
 
