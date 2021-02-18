@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
   schedule:
     - cron: '10 0 * * *'
     # cron表达式，Actions时区是UTC时间，这里是UTC时区每天0点10分运行，即UTF时区每天8点10分
