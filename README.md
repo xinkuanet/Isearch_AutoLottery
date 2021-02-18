@@ -45,13 +45,19 @@ Isearch_AutoLottery
 
 ![图示][image-1]
 
-3. **手动触发 Actions 并查看是否运行正常**
+3. **手动触发 workflow 运行**
 
 **Github Actions 默认处于关闭状态，还大家请手动开启 Actions ，执行一次工作流，验证是否可以正常工作。**
+![图示][image-2]
 
 
+4. **流程运行情况查看**
+![图示][image-3]
+![图示][image-4]
 
-如果需要修改每日任务执行的时间，请修改 `.github/workflows/auto_lottery_Isearch.yml`，在第 8 行左右位置找到下如下配置。
+   
+5. **修改每日任务执行的时间**
+如果需要，请修改 `.github/workflows/auto_lottery_Isearch.yml`，在第 8 行左右位置找到下如下配置。
 
 ```yml
   schedule:
@@ -87,5 +93,6 @@ Isearch_AutoLottery
 [1]:	https://github.com/sunsikai/Isearch_AutoLottery
 
 [image-1]:	docs/IMG/配置用户名密码.png
-
-
+[image-2]:	docs/IMG/手动触发流程.png
+[image-3]:	docs/IMG/查看执行情况1.png
+[image-4]:	docs/IMG/查看执行情况2.png
