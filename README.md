@@ -1,20 +1,34 @@
+<div align="center">
+<h1 align="center">
+Isearch_AutoLottery
+</h1>
+
+[![GitHub stars](https://img.shields.io/github/stars/sunsikai/Isearch_AutoLottery?style=flat-square)](https://github.com/JunzhouLiu/BILIBILI-HELPER/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/sunsikai/Isearch_AutoLottery?style=flat-square)](https://github.com/JunzhouLiu/BILIBILI-HELPER/network)
+[![GitHub issues](https://img.shields.io/github/issues/sunsikai/Isearch_AutoLottery?style=flat-square)](https://github.com/JunzhouLiu/BILIBILI-HELPER/issues)
+[![GitHub license](https://img.shields.io/github/license/sunsikai/Isearch_AutoLottery?style=flat-square)](https://github.com/JunzhouLiu/BILIBILI-HELPER/blob/main/LICENSE) 
+
+
+</div>
+
 ## 工具简介
 
-这是一个利用 Linux Crontab , GitHub Action 等方式实现艺赛旗设计器，每日自动进行签到抽奖\~\~\~\~
+这是一个利用 GitHub Action 等方式实现艺赛旗设计器，每日自动进行签到抽奖\~\~\~\~
 
 **如果觉得好用，顺手点个 Star 吧 ❤**
 
 **仓库地址：[sunsikai/Isearch_AutoLottery][1]**
 
-**请不要滥用相关API，让我们一起爱护艺赛旗RPA站 ❤**
+**请不要滥用相关API，让我们一起爱护艺赛旗RPA ❤**
 
 ## 功能列表
-
+### 已实现
 * [x] 每天上午 8 点 10 分自动开始任务。*【运行时间可自定义】*
 * [x] 登录设计器，进行签到。*【如果签到，则跳过】*
 * [x] 获取可抽奖次数，自动进行抽奖。
-* [x] 每日进行自动发帖，延迟设计器使用。*【未实现】*
-* [x] 通过server酱推送执行结果到微信。*【未实现】*
+### 未实现
+* [ ] 每日进行自动发帖，延迟设计器使用。
+* [ ] 通过server酱推送执行结果到微信。
 	  
 
 ## 使用说明
@@ -29,9 +43,9 @@
 | USERNAME      | 用户名              |
 | PASSWORD      | 密码                |
 
+![图示][image-1]
 
-
-1. **开启 Actions 并触发每日自动执行**
+3. **手动触发 Actions 并查看是否运行正常**
 
 **Github Actions 默认处于关闭状态，还大家请手动开启 Actions ，执行一次工作流，验证是否可以正常工作。**
 
@@ -69,7 +83,10 @@
 9. 本项目欢迎其他开发者参与贡献，基于本工具的二次开发，使用其他语言重写都没有什么问题，能在技术上给你带来帮助和收获就很好.
 10. 本项目遵守MIT License ，请各位知悉。。。
 
+
+
 [1]:	https://github.com/sunsikai/Isearch_AutoLottery
 
+[image-1]:	docs/IMG/配置用户名密码.png
 
 
