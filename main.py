@@ -4,22 +4,25 @@
 __author__ = '孙思锴'
 
 import datetime
-import json
+import time
 import os
 import random
-import time
+import re
+import json
 
 import requests
 from requests_toolbelt import MultipartEncoder
 
-from tools import encrypt_sign, getdate
-
+from tools import encrypt_sign, getdate, get_MD5
 
 requests.packages.urllib3.disable_warnings()
 requests.adapters.DEFAULT_RETRIES = 5
 
 
-class Is_checkin(object):
+class I_Studio(object):
+    """
+    艺赛旗设计器活动签到、抽奖
+    """
     def __init__(self, username, password):
         """
         uername：艺赛旗用户名
@@ -125,7 +128,6 @@ class Is_checkin(object):
         result = self._session.post(url=url, headers=headers, data=data)  # 发送签到请求
         print('签到日期：%s，签到结果：%s' % (signTime, result.text))
 
-
     def lotterycount(self):
         """
         检查可签到次数
@@ -192,15 +194,114 @@ class Is_checkin(object):
         self._session.close()
 
 
+class I_Support(object):
+    """
+    艺赛旗社区发帖、删帖（目的是为了延迟设计器使用）
+    """
+    def __init__(self, username, password):
+        """
+        TODO： 登录
+        :param username:用户名
+        :param password: 密码
+        """
+        self._username = username
+        self._password = password
+        parme = {
+            "nameOrEmail": self._username,
+            "userPassword": get_MD5(self._password),
+            "rememberLogin": True,
+            "captcha": ""
+        }
+        self._session = requests.Session()
+        self._session.keep_alive = False
+        result = self._session.post('https://support.i-search.com.cn/login', data=str(parme), timeout=10, verify=False)
+        if result.json().get('token'):
+            print('社区登录成功！')
+        else:
+            print("社区失败失败！失败原因：%s" % result.json().get('msg'))
+            exit()
+
+    def getCsrftoken(self):
+        """
+        获取 csrftoken
+        """
+        url = 'https://support.i-search.com.cn/post?type=0'
+        result = self._session.get(url=url, verify=False)  # 模拟请求获取网页信息
+        csrftoken = re.findall(r"csrfToken: \'(.+?)\'", result.text)[0]  # 正则表达式提取csrftoken
+        # 判断csrftoken是否存在
+        if csrftoken:
+            print('获取csrfToken成功：', csrftoken)
+            return csrftoken
+        else:
+            print('csrfToken获取失败，结束程序！')
+            exit(0)
+
+    def article(self, csrftoken, title, content):
+        """
+        发帖
+        :param title:帖子标题
+        :param content: 帖子内容
+        :param csrftoken:
+        :return: articleId 帖子id
+        """
+        url = 'https://support.i-search.com.cn/article'
+        headers = {
+            "csrftoken": csrftoken,
+            "Referer": "https://support.i-search.com.cn/post?type=0"
+        }
+        data = {
+            "articleTitle": title,  # 文章标题
+            "articleContent": content,  # 文章内容
+            "articleTags": "疯狂吐槽,",  # 文章标签
+            "articleCommentable": False,  # 是否允许回帖
+            "articleType": 0,  # 文章类型，0：普通帖子，1：讨论组（小黑屋），2：同城广播，3：思绪
+            "articleRewardContent": "",
+            "articleRewardPoint": "",
+
+        }
+
+        data = json.dumps(data)  # 转换为字符串
+        data = data.replace(' ', '')  # 去除空格，如不去除空格会提示：调用凭证不合法
+
+        result = self._session.post(url=url, headers=headers, data=data, verify=False)
+        if result.json().get('sc') == 0:
+            articleId = result.json().get('articleId')
+            print('帖子发布成功！articleId：%s' % articleId)
+            return articleId
+        else:
+            print('帖子发布失败，结束程序')
+            exit(0)
+
+    def article_remove(self, articleId):
+        """
+        删除帖子
+        :param articleId 帖子id
+        :return:
+        """
+        # 删除帖子
+        url = 'https://support.i-search.com.cn/article/' + articleId + '/remove'
+        result = self._session.post(url=url)
+        if result.json().get('sc') == 0:
+            print('帖子删除成功！articleId：%s' % articleId)
+        else:
+            print('帖子删除失败，请检查！')
+
+    def __del__(self):
+        # 关闭session连接
+        self._session.close()
+
+
 if __name__ == "__main__":
     print('当前时间：', datetime.datetime.now())
     env_dist = os.environ
-    username = env_dist.get('USERNAME')  # 用户名
-    password = env_dist.get('PASSWORD')  # 密码
+    username = '13226617606'  # 用户名
+    password = 'SUNkai1225'  # 密码
+    # username = env_dist.get('USERNAME')  # 用户名
+    # password = env_dist.get('PASSWORD')  # 密码
     if not all((username, password)):
         print('获取用户名密码失败，请从先配置用户名或密码再启动程序！')
         exit()
-    isearch = Is_checkin(username, password)
+    isearch = I_Studio(username, password)
     signTimeList = isearch.checkinHistroy()  # 获取本周期签到历史
 
     # 获取最近三天日期
@@ -213,7 +314,7 @@ if __name__ == "__main__":
         for day in needCheckDate:
             # 进行签到
             isearch.checkin(signTime=day)
-            time.sleep(random.randint(2, 4))
+            time.sleep(random.randint(1, 2))
     else:
         print('无需签到日期，跳过签到动作！')
 
@@ -222,7 +323,7 @@ if __name__ == "__main__":
         print('-' * 5 + '开始进行抽奖' + '-' * 5)
         for _ in range(remainingTimes):
             isearch.lottery()
-            time.sleep(random.randint(2, 4))
+            time.sleep(random.randint(1, 2))
     else:
         print('无可抽奖次数，跳过抽奖动作！')
 

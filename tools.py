@@ -29,3 +29,8 @@ def getdate(beforeOfDay=0):
     # 获取想要的日期的时间
     re_date = (today + offset).strftime('%Y-%m-%d')
     return re_date
+
+def get_MD5(password):
+    """对密码进行MD5加密"""
+    md5_str = hashlib.md5(password.encode())
+    return md5_str.hexdigest()
