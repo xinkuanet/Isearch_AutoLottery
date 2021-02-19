@@ -31,4 +31,4 @@ jobs:
         SERVERPUSHKEY: ${{ secrets.SERVERPUSHKEY }}
         TZ: Asia/Shanghai
       run: |
-        python main.py
+        python test.py
