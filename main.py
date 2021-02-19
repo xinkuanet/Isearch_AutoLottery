@@ -9,7 +9,8 @@ import os
 import random
 import re
 import json
-
+import logging
+import sys
 import requests
 from requests_toolbelt import MultipartEncoder
 
@@ -17,6 +18,8 @@ from tools import encrypt_sign, getdate, get_MD5
 
 requests.packages.urllib3.disable_warnings()
 requests.adapters.DEFAULT_RETRIES = 5
+
+
 
 
 class I_Studio(object):
@@ -28,7 +31,7 @@ class I_Studio(object):
         uername：艺赛旗用户名
         password: 密码
         """
-        print('-'*5 + '艺赛旗账户自动登录' + '-'*5)
+        logger.info('-'*5 + '艺赛旗设计器登录' + '-'*5)
         self._username = username  # 用户名
         self._password = password  # 密码
         self._deviceCode = ''.join(random.choice('0123456789ABCDEF') for _ in range(32))  # 生成随机机器码
@@ -52,28 +55,28 @@ class I_Studio(object):
         #
 
         if not result.json().get('access_token'):
-            print('登录失败，错误信息：%s' % result.json().get('msg'))
+            logger.info('登录失败，错误信息：%s' % result.json().get('msg'))
             exit()
         else:
-            print('登录成功，响应token结果：%s' % result.json().get('access_token'))
+            logger.info('登录成功，响应token结果：%s' % result.json().get('access_token'))
             self._access_token = result.json().get('access_token')
 
             # 生成抽奖页面链接
             url = 'https://rpa.i-search.com.cn/store/attendance?token=' + self._access_token + '&lang=zh_CN&machineCode=' + \
                  self._deviceCode + '&channel_no=DevStand&_=' + str(round(time.time() * 1000))
-            print('生成签到抽奖页面链接：%s' % url)
+            logger.info('生成签到抽奖页面链接：%s' % url)
 
             # 第二步，获取用户信息结果
             url = 'https://account.i-search.com.cn/v1/studio/expiration?token=' + self._access_token + '&lang=zh_CN'
             result = self._session.get(url=url, verify=False)
-            print('用户最近登录时间：%s' % result.json().get('result').get('lastLoginTime'))
+            logger.info('用户最近登录时间：%s' % result.json().get('result').get('lastLoginTime'))
             self._custNo = result.json().get('result').get('custNo')
             self._custName = result.json().get('result').get('userName')
             self._tenantNo = result.json().get('result').get('tenantNo')
 
     def checkinHistroy(self):
         # 获取签到历史
-        print('-' * 5 + '获取签到信息' + '-' * 5)
+        logger.info('-' * 5 + '获取签到信息' + '-' * 5)
         url = "https://restapi.i-search.com.cn/store/v1/checkin?custNo=" + self._custNo
         timestamp = str(round(time.time() * 1000))  # 获取时间戳
         signature = encrypt_sign(timestamp=timestamp, data='custNo=' + self._custNo)  # 计算签名
@@ -87,7 +90,7 @@ class I_Studio(object):
         result = self._session.get(url=url, headers=headers, verify=False)  # 发送请求
         day = result.json().get('result').get('day')
         signTimeList = [signDate.get('signTime') for signDate in result.json().get('result').get('signList')]
-        print('今天是签到周期中的第：%s 天，本周期已签到记录：%s' % (day, str(signTimeList)))
+        logger.info('今天是签到周期中的第：%s 天，本周期已签到记录：%s' % (day, str(signTimeList)))
         return signTimeList
 
     def checkin(self, signTime=""):
@@ -126,14 +129,14 @@ class I_Studio(object):
             "timestamp": timestamp,
         }
         result = self._session.post(url=url, headers=headers, data=data)  # 发送签到请求
-        print('签到日期：%s，签到结果：%s' % (signTime, result.text))
+        logger.info('签到日期：%s，签到结果：%s' % (signTime, result.text))
 
     def lotterycount(self):
         """
         检查可签到次数
         :return: int
         """
-        print('-' * 5 + '获取可抽奖次数' + '-' * 5)
+        logger.info('-' * 5 + '获取可抽奖次数' + '-' * 5)
         # 第一步，统计账号可抽奖次数
         url = 'https://restapi.i-search.com.cn/store/v1/lotterycount?custNo=' + self._custNo
         timestamp = str(round(time.time() * 1000))  # 获取时间戳
@@ -146,7 +149,7 @@ class I_Studio(object):
         # result = self._session.get(url=url, headers=headers)  # 发送请求
         result = self._session.get(url=url, headers=headers, verify=False)  # 发送请求
         remainingTimes = result.json()['result']['remainingTimes']  # 可抽奖次数
-        print('当前可抽奖次数为：%s' % remainingTimes)
+        logger.info('当前可抽奖次数为：%s' % remainingTimes)
         return remainingTimes
 
     def lottery(self, pricedict='奖品信息字典.json'):
@@ -184,10 +187,10 @@ class I_Studio(object):
                 price_dict = f.read()
             price_dict = eval(price_dict)  # 字符串转换字典
             priceInfo = price_dict[str(prizeId)]  # 奖品信息
-            print('抽奖抽到的奖品是：%s' % priceInfo)
+            logger.info('抽奖抽到的奖品是：%s' % priceInfo)
             # 记录中奖奖品信息到本地文件
         else:
-            print('抽奖请求失败，请求结果：%s' % result.text)
+            logger.info('抽奖请求失败，请求结果：%s' % result.text)
 
     def __del__(self):
         # 关闭session连接
@@ -204,6 +207,7 @@ class I_Support(object):
         :param username:用户名
         :param password: 密码
         """
+        logger.info('-' * 5 + '艺赛旗社区登录' + '-' * 5)
         self._username = username
         self._password = password
         parme = {
@@ -216,24 +220,25 @@ class I_Support(object):
         self._session.keep_alive = False
         result = self._session.post('https://support.i-search.com.cn/login', data=str(parme), timeout=10, verify=False)
         if result.json().get('token'):
-            print('社区登录成功！')
+            logger.info('社区登录成功！响应token %s' % result.json().get('token'))
         else:
-            print("社区失败失败！失败原因：%s" % result.json().get('msg'))
+            logger.info("社区登录失败！失败原因：%s" % result.json().get('msg'))
             exit()
 
     def getCsrftoken(self):
         """
         获取 csrftoken
         """
+        logger.info('-' * 5 + '开始获取csrfToken' + '-' * 5)
         url = 'https://support.i-search.com.cn/post?type=0'
         result = self._session.get(url=url, verify=False)  # 模拟请求获取网页信息
         csrftoken = re.findall(r"csrfToken: \'(.+?)\'", result.text)[0]  # 正则表达式提取csrftoken
         # 判断csrftoken是否存在
         if csrftoken:
-            print('获取csrfToken成功：', csrftoken)
+            logger.info('获取csrfToken成功：csrftoken：%s' % csrftoken)
             return csrftoken
         else:
-            print('csrfToken获取失败，结束程序！')
+            logger.info('获取csrfToken失败：取消发帖！')
             exit(0)
 
     def article(self, csrftoken, title, content):
@@ -244,6 +249,7 @@ class I_Support(object):
         :param csrftoken:
         :return: articleId 帖子id
         """
+        logger.info('-' * 5 + '开始进行发帖' + '-' * 5)
         url = 'https://support.i-search.com.cn/article'
         headers = {
             "csrftoken": csrftoken,
@@ -266,10 +272,10 @@ class I_Support(object):
         result = self._session.post(url=url, headers=headers, data=data, verify=False)
         if result.json().get('sc') == 0:
             articleId = result.json().get('articleId')
-            print('帖子发布成功！articleId：%s' % articleId)
+            logger.info('帖子发布成功！articleId：%s' % articleId)
             return articleId
         else:
-            print('帖子发布失败，结束程序')
+            logger.info('帖子发布失败，结束程序')
             exit(0)
 
     def article_remove(self, articleId):
@@ -279,51 +285,93 @@ class I_Support(object):
         :return:
         """
         # 删除帖子
+        logger.info('-' * 5 + '开始进行删帖' + '-' * 5)
         url = 'https://support.i-search.com.cn/article/' + articleId + '/remove'
         result = self._session.post(url=url)
         if result.json().get('sc') == 0:
-            print('帖子删除成功！articleId：%s' % articleId)
+            logger.info('帖子删除成功！articleId：%s' % articleId)
         else:
-            print('帖子删除失败，请检查！')
+            logger.info('帖子删除失败，请手动社区进行删帖！')
 
     def __del__(self):
         # 关闭session连接
         self._session.close()
 
 
+def getLogger(filename='isearch.md'):
+    """
+
+    """
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+
+    # 2、创建一个handler，用于写入日志文件
+    fh = logging.FileHandler(filename=filename, mode='w', encoding='UTF-8')
+    fh.setLevel(logging.INFO)
+    fh_formatter = logging.Formatter('###### %(message)s  ')
+    fh.setFormatter(fh_formatter)
+
+    # 再创建一个handler，用于输出到控制台
+    ch = logging.StreamHandler(stream=sys.stdout)
+    ch.setLevel(logging.INFO)
+    ch_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    ch.setFormatter(ch_formatter)
+
+    # 5、给logger添加handler
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    return logger
+
+def sendMessage(SERVERPUSHKEY):
+
+    """
+    发送微信通知
+    """
+    pass
+
 if __name__ == "__main__":
-    print('当前时间：', datetime.datetime.now())
+    # 1、创建一个logger
+    logger = getLogger()
+
+    logger.info('当前时间：%s' % str(datetime.datetime.now()))
     env_dist = os.environ
-    username = '13226617606'  # 用户名
-    password = 'SUNkai1225'  # 密码
-    # username = env_dist.get('USERNAME')  # 用户名
-    # password = env_dist.get('PASSWORD')  # 密码
+    username = env_dist.get('USERNAME')  # 用户名
+    password = env_dist.get('PASSWORD')  # 密码
     if not all((username, password)):
-        print('获取用户名密码失败，请从先配置用户名或密码再启动程序！')
+        logger.info('获取用户名密码失败，请从先配置用户名或密码再启动程序！')
         exit()
-    isearch = I_Studio(username, password)
-    signTimeList = isearch.checkinHistroy()  # 获取本周期签到历史
+    studio = I_Studio(username, password)
+    signTimeList = studio.checkinHistroy()  # 获取本周期签到历史
 
     # 获取最近三天日期
     dateFor3 = [getdate(day) for day in range(3)]
     # 获取最近三天还没签到的数据
     needCheckDate = [day for day in dateFor3 if day not in signTimeList]
     if needCheckDate:
-        print('需进行签到日期：%s' % str(needCheckDate))
-        print('-' * 5 + '开始进行签到' + '-' * 5)
+        logger.info('需进行签到日期：%s' % str(needCheckDate))
+        logger.info('-' * 5 + '开始进行签到' + '-' * 5)
         for day in needCheckDate:
             # 进行签到
-            isearch.checkin(signTime=day)
+            studio.checkin(signTime=day)
             time.sleep(random.randint(1, 2))
     else:
-        print('无需签到日期，跳过签到动作！')
+        logger.info('无需签到日期，跳过签到动作！')
 
-    remainingTimes = isearch.lotterycount()
+    remainingTimes = studio.lotterycount()
     if remainingTimes:
-        print('-' * 5 + '开始进行抽奖' + '-' * 5)
+        logger.info('-' * 5 + '开始进行抽奖' + '-' * 5)
         for _ in range(remainingTimes):
-            isearch.lottery()
+            studio.lottery()
             time.sleep(random.randint(1, 2))
     else:
-        print('无可抽奖次数，跳过抽奖动作！')
+        logger.info('无可抽奖次数，跳过抽奖动作！')
+
+    community = I_Support(username, password)
+    csrftoken = community.getCsrftoken()
+    title = '延迟设计器使用' + str(random.random())
+    content = '大哥大嫂过年好，本帖仅用于延长一天设计器使用，发完即删，如您有幸看到本帖请忽略！感谢！！共建美好文明社区！'
+    articleId = community.article(csrftoken, title, content)
+    community.article_remove(articleId)
+
+
 
