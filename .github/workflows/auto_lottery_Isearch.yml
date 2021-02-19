@@ -6,9 +6,10 @@ on:
   #     - master
   workflow_dispatch:
   schedule:
-    - cron: '10 0 * * *'
+    - cron: '30 0 * * *'
+    # - cron: '10 0 * * *' 怀疑Github Actions的时间比国内时间相差8小时50分
     # cron表达式，Actions时区是UTC时间，这里是UTC时区每天0点10分运行，即UTF时区每天8点10分
-
+    
 jobs:
   start:
     runs-on: ubuntu-latest
