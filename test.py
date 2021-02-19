@@ -25,19 +25,34 @@ import logging
 # 创建一个logger日志对象
 import sys
 
-logger = logging.getLogger('test_logger')
-logger.setLevel(logging.DEBUG)  # 设置默认的日志级别
 
-# 创建日志格式对象
+
+
+
+import logging
+
+# 1、创建一个logger
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+# 2、创建一个handler，用于写入日志文件
+fh = logging.FileHandler('test.log')
+fh.setLevel(logging.DEBUG)
+
+# 再创建一个handler，用于输出到控制台
+ch = logging.StreamHandler(stream=sys.stdout)
+ch.setLevel(logging.DEBUG)
+
+# 3、定义handler的输出格式（formatter）
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-# 创建StreamHandler对象
-sh = logging.StreamHandler()
-# StreamHandler对象自定义日志级别
-sh.setLevel(logging.DEBUG)
-# StreamHandler对象自定义日志格式
-sh.setFormatter(formatter)
+# 4、给handler添加formatter
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
 
-logger.addHandler(sh)  # logger日志对象加载StreamHandler对象
-# 日志输出
-logger.info('newdream')
+# 5、给logger添加handler
+logger.addHandler(fh)
+logger.addHandler(ch)
+logger.debug(msg='ddd')
+
+
