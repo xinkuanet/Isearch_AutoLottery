@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# __author__ = '孙思锴'
-#
-# import logging
-#
+__author__ = '孙思锴'
+
+import logging
+
 # logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s',
 #                     filename='test.log', filemode='w')
 #
@@ -32,7 +32,7 @@ logger.setLevel(logging.DEBUG)  # 设置默认的日志级别
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # 创建StreamHandler对象
-sh = logging.StreamHandler(stream=sys.stdout)
+sh = logging.StreamHandler()
 # StreamHandler对象自定义日志级别
 sh.setLevel(logging.DEBUG)
 # StreamHandler对象自定义日志格式
