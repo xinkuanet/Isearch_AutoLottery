@@ -27,8 +27,7 @@ Isearch_AutoLottery
 * [x] 登录设计器，进行签到。*【如果签到，则跳过】*
 * [x] 获取可抽奖次数，自动进行抽奖。
 * [x] 每日进行自动发帖、删帖，延长设计器使用。
-### 未实现
-* [ ] 通过server酱推送执行结果到微信。
+* [x] 通过server酱推送执行结果到微信。
 	  
 
 ## 使用说明
@@ -36,12 +35,15 @@ Isearch_AutoLottery
 ### 一、Actions 方式
 
 1. **Fork 本项目**
-2. **点击项目 Settings -\> Secrets -\> New Secrets 添加以下 2 个 Secrets，**
+2. **点击项目 Settings -\> Secrets -\> New Secrets 添加以下 3 个 Secrets，其中server酱微信推送的sckey可参阅后面设置**
 
 | Name          | Value               |
 | ------------- | ------------------- |
 | USERNAME      | 用户名              |
 | PASSWORD      | 密码                |
+| SERVERPUSHKEY | server酱推送的sckey（用于微信通知，没配置则不微信通知）|
+
+
 ![图示][image-1]
 
 
@@ -53,8 +55,8 @@ Isearch_AutoLottery
 
 ```yml
   schedule:
-    - cron: '10 0 * * *'
-    # cron表达式，Actions时区是UTC时间，这里是UTC时区每天0点10分运行，即UTF时区每天8点10分
+    - cron: '0 20 * * *'
+    # cron表达式，Actions时区是UTC时间，这里是UTC时区每天20点0分运行，即UTF时区每天4点0分运行（实测会快8个多小时，无法精确到分）
     # 不懂cron表达式的，可以进网站[https://crontab.guru/](https://crontab.guru/)看下
 ```
 **这里强烈建议大家自己实际情况修改下，不然大家的程序每天都同个时间点去签到，那也太。。。。**
@@ -81,7 +83,22 @@ Isearch_AutoLottery
 
 **Please be sure to abide by the Github terms when using Actions. Do not abuse the Actions service.**
 
+## 订阅执行结果
+### Server酱Turbo版
 
+目前Turbo版本的消息通道支持以下渠道
+
+- 自定义微信测试号
+- 方糖服务号
+
+1. 前往 [sct.ftqq.com](https://sct.ftqq.com/sendkey)点击登入，创建账号。
+2. 点击点[SendKey](https://sct.ftqq.com/sendkey) ，生成一个 Key。将其增加到 Github Secrets 中，变量名为 `SERVERPUSHKEY`
+3. [配置消息通道](https://sct.ftqq.com/forward) ，选择方糖服务号，保存即可。
+4. 推送效果展示
+   ![图示](docs/IMG/server酱推送效果.png)
+
+**
+旧版推送渠道[sc.ftqq.com](http://sc.ftqq.com/9.version]即将与4月底下线，请前往[sct.ftqq.com](https://sct.ftqq.com/sendkey)生成`Turbo`版本的`Key`，注意，申请Turbo版Key后请配置消息通道，如果想沿用以前的推送方式，选择方糖服务号即可**
 
 ## 免责声明
 
