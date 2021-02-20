@@ -94,7 +94,7 @@ Isearch_AutoLottery
 4. 推送效果展示
    ![图示][image-5]
 
-**旧版推送渠道[sc.ftqq.com](http://sc.ftqq.com/9.version]即将与4月底下线，请前往[sct.ftqq.com](https://sct.ftqq.com/sendkey)生成`Turbo`版本的`Key`，注意，申请Turbo版Key后请配置消息通道，如果想沿用以前的推送方式，选择方糖服务号即可**
+**旧版推送渠道[sc.ftqq.com](http://sc.ftqq.com/9.version)即将与4月底下线，请前往[sct.ftqq.com](https://sct.ftqq.com/sendkey)生成`Turbo`版本的`Key`，注意，申请Turbo版Key后请配置消息通道，如果想沿用以前的推送方式，选择方糖服务号即可**
 
 ## 免责声明
 
