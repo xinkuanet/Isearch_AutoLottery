@@ -136,7 +136,7 @@ class I_Studio(object):
             "timestamp": timestamp,
         }
         result = self._session.post(url=url, headers=headers, data=data)  # 发送签到请求
-        logger.info('签到日期：%s，签到结果：%s' % (signTime, result.text))
+        logger.info('签到日期：%s，签到请求结果：%s' % (signTime, result.json().get('msg')))
 
     def lotterycount(self):
         """
@@ -243,7 +243,7 @@ class I_Support(object):
         csrftoken = re.findall(r"csrfToken: \'(.+?)\'", result.text)[0]  # 正则表达式提取csrftoken
         # 判断csrftoken是否存在
         if csrftoken:
-            logger.info('获取csrfToken成功：csrftoken：%s' % csrftoken)
+            logger.info('获取成功！csrftoken：%s' % csrftoken)
             return csrftoken
         else:
             raise Exception("获取csrfToken失败：取消发帖！")
@@ -340,7 +340,7 @@ def sendMessage(key):
         result = requests.post(url, date)
         result.encoding = 'utf-8'
         if result.json().get('errno') == 0:
-            logger.info('已发起微信推送！请求结果：%s' % str(result.json()))
+            logger.info('已发起微信推送！推送提示：%s' % str(result.json().get('errmsg')))
 
 
 if __name__ == "__main__":
@@ -351,7 +351,8 @@ if __name__ == "__main__":
     password = env_dist.get('PASSWORD')  # 密码
     serverkey = env_dist.get('SERVERPUSHKEY')
 
-    logger.info('当前时间：%s，当前账户：%s' % (str(datetime.datetime.now()), username))
+    logger.info('当前时间：%s' % datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    logger.info('当前操作账户：%s' % username)
     if not all((username, password)):
         logger.info('请先从Actions secrets配置用户名及密码，再启动本流程！')
     else:
