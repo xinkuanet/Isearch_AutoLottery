@@ -73,13 +73,10 @@ Isearch_AutoLottery
 ![图示][image-3]
 ![图示][image-4]
 
-6. 结束！如果流程运行日志能正常显示，说明程序没问题，大家就这么挂着吧，基本上也不用理了。
+本工具的 Actions 自动构建配置了缓存，平均运行时间在 25s 左右。
 
-本工具的 Actions 自动构建配置了缓存，平均运行时间在 20s 左右。
 
-*如果收到了 GitHub Action 的错误邮件，检查用户名密码是否改变失效了*
-
-**请各位使用 Actions 时务必遵守Github条款。不要滥用Actions服务。**
+**请各位使用 Actions 时务必遵守Github条款。不要滥用Actions服务。同时，请遵循艺赛旗社区约定，更不要通过本流程 api对社区进行大量发帖以获取Y币，小心账号被封的。（这些后台可以看到数据的，人家能容忍用户水帖来延迟设计器使用已经是很大气的表现了，请大家不要去无底线挑战人家底线。如因大量水贴导致账户被封，完全是自己作死）**
 
 **Please be sure to abide by the Github terms when using Actions. Do not abuse the Actions service.**
 
@@ -95,10 +92,9 @@ Isearch_AutoLottery
 2. 点击点[SendKey](https://sct.ftqq.com/sendkey) ，生成一个 Key。将其增加到 Github Secrets 中，变量名为 `SERVERPUSHKEY`
 3. [配置消息通道](https://sct.ftqq.com/forward) ，选择方糖服务号，保存即可。
 4. 推送效果展示
-   ![图示](docs/IMG/server酱推送效果.png)
+   ![图示](image-5)
 
-**
-旧版推送渠道[sc.ftqq.com](http://sc.ftqq.com/9.version]即将与4月底下线，请前往[sct.ftqq.com](https://sct.ftqq.com/sendkey)生成`Turbo`版本的`Key`，注意，申请Turbo版Key后请配置消息通道，如果想沿用以前的推送方式，选择方糖服务号即可**
+**旧版推送渠道[sc.ftqq.com](http://sc.ftqq.com/9.version]即将与4月底下线，请前往[sct.ftqq.com](https://sct.ftqq.com/sendkey)生成`Turbo`版本的`Key`，注意，申请Turbo版Key后请配置消息通道，如果想沿用以前的推送方式，选择方糖服务号即可**
 
 ## 免责声明
 
@@ -121,3 +117,4 @@ Isearch_AutoLottery
 [image-2]:	docs/IMG/手动触发流程.png
 [image-3]:	docs/IMG/查看执行情况1.png
 [image-4]:	docs/IMG/查看执行情况2.png
+[image-5]:	docs/IMG/server酱推送效果.png
