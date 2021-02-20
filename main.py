@@ -228,7 +228,7 @@ class I_Support(object):
         self._session.keep_alive = False
         result = self._session.post('https://support.i-search.com.cn/login', data=str(parme), timeout=10, verify=False)
         if result.json().get('token'):
-            logger.info('社区登录成功！响应token %s' % result.json().get('token'))
+            logger.info('社区登录成功！')
             self._token = result.json().get('token')
         else:
             logger.info("社区登录失败！失败原因：%s" % result.json().get('msg'))
