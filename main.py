@@ -314,7 +314,7 @@ def getLogger(filename='isearch.md'):
     # 2、创建一个handler，用于写入日志文件
     fh = logging.FileHandler(filename=filename, mode='w', encoding='UTF-8')
     fh.setLevel(logging.INFO)
-    fh_formatter = logging.Formatter('- %(message)s  ')
+    fh_formatter = logging.Formatter('%(message)s  ')
     fh.setFormatter(fh_formatter)
 
     # 再创建一个handler，用于输出到控制台
